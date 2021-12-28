@@ -6,19 +6,21 @@
     <title>Page Title</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <style>
-        body { margin: 0; }
+        body { margin: 0; background-color: silver; width: 100%; height: 100%; text-align: center;}
         canvas { display: block; }
+        #webGL { margin :0 auto; text-align: center; display: inline-block;}
     </style>
 </head>
 <body>
-    
+    <div id="webGL" name="webGL"></div>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
-    document.body.appendChild( renderer.domElement );
+    document.getElementById("webGL").appendChild( renderer.domElement );
 
+    //카메라 파라미터 시야각, 종횡비, 랜더링기준1, 랜더링기준2, 
     const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
     camera.position.set( 0, 0, 100 );
     camera.lookAt( 0, 0, 0 );
@@ -26,6 +28,7 @@
     const scene = new THREE.Scene();
     scene.background =  new THREE.Color(0xffffff);
 
+    //상자 추가
     function addCube(){
 
         const geometry = new THREE.BoxGeometry();
@@ -36,6 +39,7 @@
         scene.add( cube );
     }
 
+    //라인 추가 
     function addLine(start, end, color){
 
         const points = [];
@@ -50,16 +54,20 @@
         scene.add( line );
     }
 
+    //scene 렌더링
     function animate() {
         requestAnimationFrame( animate );
         renderer.render( scene, camera );
     }
 
     addCube();
+
     addLine([-30, 30, 0],[30, 30, 0], 0x000000);
     addLine([30, 30, 0],[30, -30, 0], 0x000000);
     addLine([30, -30, 0],[-30, -30, 0], 0x000000);
     addLine([-30, -30, 0],[-30, 30, 0], 0x000000);
+
     animate();
 </script>
+
 </html> 
