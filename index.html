@@ -17,16 +17,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
     const renderer = new THREE.WebGLRenderer();
-    renderer.setSize( window.innerWidth, window.innerHeight );
-    document.getElementById("webGL").appendChild( renderer.domElement );
-
     //카메라 파라미터 시야각, 종횡비, 랜더링기준1, 랜더링기준2, 
-    const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
-    camera.position.set( 0, 0, 100 );
-    camera.lookAt( 0, 0, 0 );
+    const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 100 );
 
+    const webGLDiv = document.getElementById("webGL");
     const scene = new THREE.Scene();
-    scene.background =  new THREE.Color(0xffffff);
+    const group = new THREE.Group();
 
     //상자 추가
     function addCube(){
@@ -60,12 +56,55 @@
         renderer.render( scene, camera );
     }
 
-    addCube();
+    function init(){
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        webGLDiv.append( renderer.domElement );
 
-    addLine([-30, 30, 0],[30, 30, 0], 0x000000);
-    addLine([30, 30, 0],[30, -30, 0], 0x000000);
-    addLine([30, -30, 0],[-30, -30, 0], 0x000000);
-    addLine([-30, -30, 0],[-30, 30, 0], 0x000000);
+        camera.lookAt( 0, 0, 0 );
+        camera.position.set( 20, 20, 100 );
+        
+        scene.background =  new THREE.Color(0xffffff);
+    }
+
+    function darwGrid(width, heigth){
+
+        for(var i = 0 ; i <= width ; i+=2){
+            const points = [];
+
+            points.push( new THREE.Vector3( -width/2 + width/2, i, 0));
+            points.push( new THREE.Vector3( width/2 + width/2, i, 0));
+
+            const geometry = new THREE.BufferGeometry().setFromPoints( points );
+            const material = new THREE.LineBasicMaterial( { color: 0x000000 } );
+
+            const line = new THREE.Line( geometry, material );
+
+            scene.add( line );
+        }
+
+        for(var i = 0 ; i <= heigth ; i+=2){
+            const points = [];
+
+            points.push( new THREE.Vector3( i, -heigth/2 + heigth/2, 0));
+            points.push( new THREE.Vector3( i, heigth/2 + heigth/2, 0));
+
+            const geometry = new THREE.BufferGeometry().setFromPoints( points );
+            const material = new THREE.LineBasicMaterial( { color: 0x000000 } );
+
+            const line = new THREE.Line( geometry, material );
+
+            scene.add( line );
+        }
+    }
+
+    init();
+    darwGrid(50, 50, 0,0);
+    //addCube();
+
+    //addLine([-30, 30, 0],[30, 30, 0], 0x000000);
+    //addLine([30, 30, 0],[30, -30, 0], 0x000000);
+    //addLine([30, -30, 0],[-30, -30, 0], 0x000000);
+    //addLine([-30, -30, 0],[-30, 30, 0], 0x000000);
 
     animate();
 </script>
