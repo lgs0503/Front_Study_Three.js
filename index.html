@@ -7,7 +7,7 @@
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <style>
         body { margin: 0; background-color: silver; width: 100%; height: 100%; text-align: center;}
-        canvas { display: block; }
+        canvas { display: block; border : solid 2px black;}
         #webGL { margin :0 auto; text-align: center; display: inline-block; width: 500px; height: 500px; position: relative;}
         .webGl-btn { width: 30px; height: 30px; font-size:16px; font-weight: bold; position: absolute; left: 20px;}
     </style>
@@ -58,21 +58,35 @@
         renderer.render( scene, camera );
     }
 
+    /* 확대 로직 */
+    function plus(){
+        var currCameraZ = camera.position.z;
+            if(currCameraZ <= 100 && currCameraZ >= 10) {
+                currCameraZ = currCameraZ - 5;
+                camera.position.set(camera.position.x, camera.position.y, currCameraZ);
+        } 
+    }
+    
+    /* 축소 로직 */
+    function minus(){
+        var currCameraZ = camera.position.z;
+        if(currCameraZ < 99) {
+            currCameraZ = currCameraZ + 5;
+            camera.position.set(camera.position.x, camera.position.y, currCameraZ);
+        } 
+    }
+
     /* 캔버스 초기화 */
     function init(){
 
-        /* 확대 축소 로직 */
+        /* 확대 축소 버튼 추가 */
         var plusBtn = document.createElement("button");
         plusBtn.innerText = "+";
         plusBtn.className = "webGl-btn";
         plusBtn.style = "top:20px";
 
         plusBtn.onclick = function(){
-            var currCameraZ = camera.position.z;
-            if(currCameraZ <= 100 && currCameraZ >= 10) {
-                currCameraZ = currCameraZ - 5;
-                camera.position.set(camera.position.x, camera.position.y, currCameraZ);
-            } 
+            plus();
         }
         
         var minusBtn = document.createElement("button");
@@ -80,44 +94,56 @@
         minusBtn.className = "webGl-btn";
         minusBtn.style = "top:60px";
         minusBtn.onclick = function(){
-            var currCameraZ = camera.position.z;
-            if(currCameraZ < 99) {
-                currCameraZ = currCameraZ + 5;
-                camera.position.set(camera.position.x, camera.position.y, currCameraZ);
-            } 
+            minus();
         }
-
-        /*버튼 추가 */
         webGLDiv.append(plusBtn);
         webGLDiv.append(minusBtn);
+
+        /* 마우스 휠 확대축소 */
+        renderer.domElement.addEventListener('mousewheel', function (evt) {
+            if(evt.wheelDelta >= 0){
+                plus();
+            } else {
+                minus();
+            }
+        }, false);
 
         /* 캔버스 마우스 화면 드래그 로직*/
         var mouseDown = false,
             mouseX = 0,
             mouseY = 0;
-
         renderer.domElement.addEventListener('mousedown', function (evt) {
-            evt.preventDefault();
             mouseDown = true;
             mouseX = evt.clientX;
             mouseY = evt.clientY;
         }, false);
         
         renderer.domElement.addEventListener('mouseup', function (evt) {
-            evt.preventDefault();
             mouseDown = false;
         }, false);
 
         renderer.domElement.addEventListener('mousemove', function (evt) {
-            if (!mouseDown) 
+
+            var cursor = this.style.cursor;
+             /* 드래그를 할경우 마우스 포인터 변경*/
+            if (!mouseDown) {
+                if(cursor != "auto")
+                    this.style = "cursor:auto";
                 return 
+            } else {
+                if(cursor != "move")
+                    this.style = "cursor:move";
+            }
 
-            evt.preventDefault();
-
-            var deltaX = evt.clientX - mouseX,
-                deltaY = evt.clientY - mouseY;
+            var deltaX = evt.clientX - mouseX;
+            var deltaY = evt.clientY - mouseY;
                         
-            camera.position.set(deltaX/10, -deltaY/10, camera.position.z);
+            camera.position.set(camera.position.x + (deltaX/5000), camera.position.y + (-deltaY/5000), camera.position.z);
+        }, false);
+
+        renderer.domElement.addEventListener('mouseleave', function (evt) {
+            evt.preventDefault();
+            mouseDown = false;
         }, false);
         
         renderer.setSize(900, 700);/*랜더링 사이즈*/
