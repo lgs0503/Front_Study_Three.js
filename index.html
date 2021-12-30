@@ -8,7 +8,8 @@
     <style>
         body { margin: 0; background-color: silver; width: 100%; height: 100%; text-align: center;}
         canvas { display: block; }
-        #webGL { margin :0 auto; text-align: center; display: inline-block;}
+        #webGL { margin :0 auto; text-align: center; display: inline-block; width: 500px; height: 500px; position: relative;}
+        .webGl-btn { width: 30px; height: 30px; font-size:16px; font-weight: bold; position: absolute; left: 20px;}
     </style>
 </head>
 <body>
@@ -18,13 +19,14 @@
 <script>
     const renderer = new THREE.WebGLRenderer();
     //카메라 파라미터 시야각, 종횡비, 랜더링기준1, 랜더링기준2, 
-    const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 100 );
+    const camera = new THREE.PerspectiveCamera( 30, 900 / 700, 1, 100 );
 
+    /* WebGl div doc */
     const webGLDiv = document.getElementById("webGL");
-    const scene = new THREE.Scene();
-    const group = new THREE.Group();
+    const scene = new THREE.Scene(); /* 장면 */
+    const group = new THREE.Group(); /* 그룹 */
 
-    //상자 추가
+    //박스 추가
     function addCube(){
 
         const geometry = new THREE.BoxGeometry();
@@ -56,50 +58,121 @@
         renderer.render( scene, camera );
     }
 
+    /* 캔버스 초기화 */
     function init(){
-        renderer.setSize( window.innerWidth, window.innerHeight );
+
+        /* 확대 축소 로직 */
+        var plusBtn = document.createElement("button");
+        plusBtn.innerText = "+";
+        plusBtn.className = "webGl-btn";
+        plusBtn.style = "top:20px";
+
+        plusBtn.onclick = function(){
+            var currCameraZ = camera.position.z;
+            if(currCameraZ <= 100 && currCameraZ >= 10) {
+                currCameraZ = currCameraZ - 5;
+                camera.position.set(camera.position.x, camera.position.y, currCameraZ);
+            } 
+        }
+        
+        var minusBtn = document.createElement("button");
+        minusBtn.innerText = "-";
+        minusBtn.className = "webGl-btn";
+        minusBtn.style = "top:60px";
+        minusBtn.onclick = function(){
+            var currCameraZ = camera.position.z;
+            if(currCameraZ < 99) {
+                currCameraZ = currCameraZ + 5;
+                camera.position.set(camera.position.x, camera.position.y, currCameraZ);
+            } 
+        }
+
+        /*버튼 추가 */
+        webGLDiv.append(plusBtn);
+        webGLDiv.append(minusBtn);
+
+        /* 캔버스 마우스 화면 드래그 로직*/
+        var mouseDown = false,
+            mouseX = 0,
+            mouseY = 0;
+
+        renderer.domElement.addEventListener('mousedown', function (evt) {
+            evt.preventDefault();
+            mouseDown = true;
+            mouseX = evt.clientX;
+            mouseY = evt.clientY;
+        }, false);
+        
+        renderer.domElement.addEventListener('mouseup', function (evt) {
+            evt.preventDefault();
+            mouseDown = false;
+        }, false);
+
+        renderer.domElement.addEventListener('mousemove', function (evt) {
+            if (!mouseDown) 
+                return 
+
+            evt.preventDefault();
+
+            var deltaX = evt.clientX - mouseX,
+                deltaY = evt.clientY - mouseY;
+                        
+            camera.position.set(deltaX/10, -deltaY/10, camera.position.z);
+        }, false);
+        
+        renderer.setSize(900, 700);/*랜더링 사이즈*/
+        renderer.setClearColor(0xf0f0f0);/* 랜더 배경화면 색상 지정*/
+        //scene.background =  new THREE.Color(0xffffff);
+
+        /* div에 랜더링 뿌리기*/
         webGLDiv.append( renderer.domElement );
 
+        /* 카메라 포지션 잡기 */
         camera.lookAt( 0, 0, 0 );
-        camera.position.set( 20, 20, 100 );
-        
-        scene.background =  new THREE.Color(0xffffff);
+        camera.position.set( 0, 0, 100 ); /* x, y, z */
     }
 
-    function darwGrid(width, heigth){
+    /* 그리드 그리기 */
+    function darwGrid(size){
 
-        for(var i = 0 ; i <= width ; i+=2){
+        /* 짝수가 아닐경우 짝수로 맞춰주기 */
+        if(size % 2 != 0){
+            size++;
+        }
+        
+        const material = new THREE.LineBasicMaterial( { color: 0x000000 } ); 
+        const material2 = new THREE.LineBasicMaterial( { color: 0x909090 } ); 
+
+        for(var i = 0 ; i <= size ; i+=2){ /*2칸씩 벌림*/
             const points = [];
+            const points2 = [];
 
-            points.push( new THREE.Vector3( -width/2 + width/2, i, 0));
-            points.push( new THREE.Vector3( width/2 + width/2, i, 0));
+            points.push( new THREE.Vector3( -size/2 + size/2, i, 0));
+            points.push( new THREE.Vector3( size/2 + size/2, i, 0));
+
+            points2.push( new THREE.Vector3( i, -size/2 + size/2, 0));
+            points2.push( new THREE.Vector3( i, size/2 + size/2, 0));
 
             const geometry = new THREE.BufferGeometry().setFromPoints( points );
-            const material = new THREE.LineBasicMaterial( { color: 0x000000 } );
+            const geometry2 = new THREE.BufferGeometry().setFromPoints( points2 );
 
-            const line = new THREE.Line( geometry, material );
-
-            scene.add( line );
+            /* 그룹으로 묶어서 저장 */
+            if(i % 5 == 0){  /* 5칸마다 검정색 */
+                group.add( new THREE.Line( geometry, material ) );
+                group.add( new THREE.Line( geometry2, material ) );
+            } else {         /* 평소 회색 */
+                group.add( new THREE.Line( geometry, material2 ) );
+                group.add( new THREE.Line( geometry2, material2 ) );
+            }
         }
-
-        for(var i = 0 ; i <= heigth ; i+=2){
-            const points = [];
-
-            points.push( new THREE.Vector3( i, -heigth/2 + heigth/2, 0));
-            points.push( new THREE.Vector3( i, heigth/2 + heigth/2, 0));
-
-            const geometry = new THREE.BufferGeometry().setFromPoints( points );
-            const material = new THREE.LineBasicMaterial( { color: 0x000000 } );
-
-            const line = new THREE.Line( geometry, material );
-
-            scene.add( line );
-        }
+        
+        /* 완성된 그룹 장면 객체에 저장 */
+        scene.add(group);
     }
 
     init();
-    darwGrid(50, 50, 0,0);
-    //addCube();
+    darwGrid(40);
+    addCube();
 
     //addLine([-30, 30, 0],[30, 30, 0], 0x000000);
     //addLine([30, 30, 0],[30, -30, 0], 0x000000);
