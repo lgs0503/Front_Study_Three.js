@@ -36,6 +36,46 @@
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
+    function drawDoor(pos, color, status){
+        const tempgGroup = new THREE.Group(); 
+        
+        const shape = new THREE.Shape();
+        shape.moveTo( 2, 0 );
+        shape.bezierCurveTo( 0, 0, 0, 0, 0, 0 );
+        shape.bezierCurveTo( 0, 0, 0, 0, 0, 2 );
+        shape.bezierCurveTo( 1, 2, 2, 1, 2, 0 );
+
+        const geometry = new THREE.BufferGeometry();
+        const points = shape.getPoints();
+        geometry.setFromPoints(points);
+
+        const material = new THREE.LineBasicMaterial({ color: color });
+        const line = new THREE.Line(geometry, material);
+
+        if(status == 'double'){
+            const shapeDb = new THREE.Shape();
+            shapeDb.moveTo( -2, 0 );
+            shapeDb.bezierCurveTo( 0, 0, 0, 0, 0, 0 );
+            shapeDb.bezierCurveTo( 0, 0, 0, 0, 0, 2 );
+            shapeDb.bezierCurveTo( -1, 2, -2, 1, -2, 0 );
+
+            const geometryDb = new THREE.BufferGeometry();
+            const pointsDb = shapeDb.getPoints();
+            geometryDb.setFromPoints(pointsDb);
+
+            const materialDb = new THREE.LineBasicMaterial({ color: color});
+            const lineDb = new THREE.Line(geometryDb, materialDb);
+            
+            tempgGroup.add(lineDb);
+        }
+
+        tempgGroup.add(line);
+        
+        tempgGroup.position.set(pos.x, pos.y, 0.003);
+        //tempgGroup.rotation.z = 1.58; //회전
+        scene.add(tempgGroup);
+    }
+
     /* 박스 그리기 */
     function drawBox(width, heigth, color, pos, borderColor, persent, status){
 
@@ -72,7 +112,7 @@
             /* 데이터 안에 프로그레스가 있는경우 */
             if(persent){
                 const geometry2 = new THREE.BoxGeometry((width/100)*persent, heigth, 0.0002);
-                const material2 = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+                const material2 = new THREE.MeshBasicMaterial( { color: 0x00ADB5 } );
                 const tempgGroup2 = new THREE.Group(); 
                 const cube2 = new THREE.Mesh( geometry2, material2 );
 
@@ -289,97 +329,104 @@
     /* 눈금 그리드 그리기 */
     drawGrid(gridSize);
 
+    drawDoor({x:0, y:13.25}, 0x393E46, "double");
+
     /* 테스트 데이터 그리기 */
-    drawBox(5, 1, 0x000000, {x:6.5 ,y:0.5});
-    drawBox(5, 1, 0x000000, {x:6.5 ,y:9.5});
-    drawBox(5, 1, 0x000000, {x:6.5 ,y:-9.5});
-    drawBox(1, 20, 0x000000, {x:6.5 ,y:0});
+    drawBox(5, 1, 0x222831, {x:6.5 ,y:0.5});
+    drawBox(5, 1, 0x222831, {x:6.5 ,y:9.5});
+    drawBox(5, 1, 0x222831, {x:6.5 ,y:-9.5});
+    drawBox(1, 20, 0x222831, {x:6.5 ,y:0});
     
-    drawBox(5, 1, 0x000000, {x:-6.5 ,y:0.5});
-    drawBox(5, 1, 0x000000, {x:-6.5 ,y:9.5});
-    drawBox(5, 1, 0x000000, {x:-6.5 ,y:-9.5});
-    drawBox(1, 20, 0x000000, {x:-6.5 ,y:0});
+    drawBox(5, 1, 0x222831, {x:-6.5 ,y:0.5});
+    drawBox(5, 1, 0x222831, {x:-6.5 ,y:9.5});
+    drawBox(5, 1, 0x222831, {x:-6.5 ,y:-9.5});
+    drawBox(1, 20, 0x222831, {x:-6.5 ,y:0});
 
-    drawBox(3, 3, 0x000000, {x:13 ,y:13});
-    drawBox(3, 3, 0x000000, {x:-13 ,y:-13});
-    drawBox(3, 3, 0x000000, {x:13 ,y:-13});
-    drawBox(3, 3, 0x000000, {x:-13 ,y:13});
-    
-    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:1.5}, 0x0000ff, 10, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:2.5}, 0x0000ff, 20, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:3.5}, 0x0000ff, 30, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:4.5}, 0x0000ff, 40, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:5.5}, 0x0000ff, 50, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:6.5}, 0x0000ff, 60, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:7.5}, 0x0000ff, 70, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:8.5}, 0x0000ff, 80, 'R');
-    
-    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:-0.5}, 0x0000ff, 10, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:-1.5}, 0x0000ff, 50, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:-2.5}, 0x0000ff, 30, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:-3.5}, 0x0000ff, 100, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:-4.5}, 0x0000ff, 90, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:-5.5}, 0x0000ff, 70, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:-6.5}, 0x0000ff, 50, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:-7.5}, 0x0000ff, 40, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:-8.5}, 0x0000ff, 40, 'R');
-    
-    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:1.5}, 0x0000ff, 10);
-    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:2.5}, 0x0000ff, 20);
-    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:3.5}, 0x0000ff, 30);
-    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:4.5}, 0x0000ff, 40);
-    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:5.5}, 0x0000ff, 50);
-    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:6.5}, 0x0000ff, 60);
-    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:7.5}, 0x0000ff, 70);
-    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:8.5}, 0x0000ff, 80);
+    drawBox(23, 0.5, 0x222831, {x:0 ,y:13});
+    drawBox(23, 0.5, 0x222831, {x:0 ,y:-13});
+    drawBox(0.5, 23, 0x222831, {x:13 ,y:0});
+    drawBox(0.5, 23, 0x222831, {x:-13 ,y:0});
 
-    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:-0.5}, 0x0000ff, 10);
-    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:-1.5}, 0x0000ff, 50);
-    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:-2.5}, 0x0000ff, 30);
-    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:-3.5}, 0x0000ff, 100);
-    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:-4.5}, 0x0000ff, 90);
-    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:-5.5}, 0x0000ff, 70);
-    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:-6.5}, 0x0000ff, 50);
-    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:-7.5}, 0x0000ff, 40);
-    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:-8.5}, 0x0000ff, 40);
+    drawBox(3, 3, 0x222831, {x:13 ,y:13});
+    drawBox(3, 3, 0x222831, {x:-13 ,y:-13});
+    drawBox(3, 3, 0x222831, {x:13 ,y:-13});
+    drawBox(3, 3, 0x222831, {x:-13 ,y:13});
 
-    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:1.5}, 0x0000ff, 10, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:2.5}, 0x0000ff, 20, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:3.5}, 0x0000ff, 30, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:4.5}, 0x0000ff, 40, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:5.5}, 0x0000ff, 50, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:6.5}, 0x0000ff, 60, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:7.5}, 0x0000ff, 70, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:8.5}, 0x0000ff, 80, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:1.5}, 0x393E46, 10, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:2.5}, 0x393E46, 20, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:3.5}, 0x393E46, 30, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:4.5}, 0x393E46, 40, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:5.5}, 0x393E46, 50, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:6.5}, 0x393E46, 60, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:7.5}, 0x393E46, 70, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:8.5}, 0x393E46, 80, 'R');
     
-    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-0.5}, 0x0000ff, 10, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-1.5}, 0x0000ff, 50, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-2.5}, 0x0000ff, 30, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-3.5}, 0x0000ff, 100, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-4.5}, 0x0000ff, 90, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-5.5}, 0x0000ff, 70, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-6.5}, 0x0000ff, 50, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-7.5}, 0x0000ff, 40, 'R');
-    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-8.5}, 0x0000ff, 40, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:-0.5}, 0x393E46, 10, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:-1.5}, 0x393E46, 50, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:-2.5}, 0x393E46, 30, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:-3.5}, 0x393E46, 100, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:-4.5}, 0x393E46, 90, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:-5.5}, 0x393E46, 70, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:-6.5}, 0x393E46, 50, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:-7.5}, 0x393E46, 40, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:-8.5}, 0x393E46, 40, 'R');
     
-    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:1.5}, 0x0000ff, 10);
-    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:2.5}, 0x0000ff, 20);
-    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:3.5}, 0x0000ff, 30);
-    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:4.5}, 0x0000ff, 40);
-    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:5.5}, 0x0000ff, 50);
-    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:6.5}, 0x0000ff, 60);
-    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:7.5}, 0x0000ff, 70);
-    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:8.5}, 0x0000ff, 80);
+    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:1.5}, 0x393E46, 10);
+    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:2.5}, 0x393E46, 20);
+    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:3.5}, 0x393E46, 30);
+    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:4.5}, 0x393E46, 40);
+    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:5.5}, 0x393E46, 50);
+    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:6.5}, 0x393E46, 60);
+    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:7.5}, 0x393E46, 70);
+    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:8.5}, 0x393E46, 80);
 
-    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-0.5}, 0x0000ff, 10);
-    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-1.5}, 0x0000ff, 50);
-    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-2.5}, 0x0000ff, 30);
-    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-3.5}, 0x0000ff, 100);
-    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-4.5}, 0x0000ff, 90);
-    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-5.5}, 0x0000ff, 70);
-    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-6.5}, 0x0000ff, 50);
-    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-7.5}, 0x0000ff, 40);
-    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-8.5}, 0x0000ff, 40);
+    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:-0.5}, 0x393E46, 10);
+    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:-1.5}, 0x393E46, 50);
+    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:-2.5}, 0x393E46, 30);
+    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:-3.5}, 0x393E46, 100);
+    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:-4.5}, 0x393E46, 90);
+    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:-5.5}, 0x393E46, 70);
+    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:-6.5}, 0x393E46, 50);
+    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:-7.5}, 0x393E46, 40);
+    drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:-8.5}, 0x393E46, 40);
+
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:1.5}, 0x393E46, 10, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:2.5}, 0x393E46, 20, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:3.5}, 0x393E46, 30, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:4.5}, 0x393E46, 40, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:5.5}, 0x393E46, 50, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:6.5}, 0x393E46, 60, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:7.5}, 0x393E46, 70, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:8.5}, 0x393E46, 80, 'R');
+    
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-0.5}, 0x393E46, 10, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-1.5}, 0x393E46, 50, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-2.5}, 0x393E46, 30, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-3.5}, 0x393E46, 100, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-4.5}, 0x393E46, 90, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-5.5}, 0x393E46, 70, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-6.5}, 0x393E46, 50, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-7.5}, 0x393E46, 40, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-8.5}, 0x393E46, 40, 'R');
+    
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:1.5}, 0x393E46, 10);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:2.5}, 0x393E46, 20);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:3.5}, 0x393E46, 30);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:4.5}, 0x393E46, 40);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:5.5}, 0x393E46, 50);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:6.5}, 0x393E46, 60);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:7.5}, 0x393E46, 70);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:8.5}, 0x393E46, 80);
+
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-0.5}, 0x393E46, 10);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-1.5}, 0x393E46, 50);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-2.5}, 0x393E46, 30);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-3.5}, 0x393E46, 100);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-4.5}, 0x393E46, 90);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-5.5}, 0x393E46, 70);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-6.5}, 0x393E46, 50);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-7.5}, 0x393E46, 40);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-8.5}, 0x393E46, 40);
 
     /* 랜더링 */
     render() ;
