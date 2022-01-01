@@ -32,6 +32,10 @@
     const scene = new THREE.Scene(); /* 장면 */
     const group = new THREE.Group(); /* 그룹 */
 
+    /* 마우스 설정*/
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
     /* 박스 그리기 */
     function drawBox(width, heigth, color, pos, borderColor, persent, status){
 
@@ -84,10 +88,6 @@
         tempgGroup.position.x = pos.x;
         tempgGroup.position.y = pos.y;
 
-        tempgGroup.addEventListener('click', function (evt) {
-            alert("test");
-        }, false);
-
         scene.add(tempgGroup);
     }
 
@@ -104,12 +104,6 @@
         const line = new THREE.Line( geometry, material );
 
         scene.add( line );
-    }
-
-    /* scene 렌더링 */
-    function animate() {
-        requestAnimationFrame( animate );
-        renderer.render( scene, camera );
     }
 
     /* 확대 로직 */
@@ -176,6 +170,7 @@
         var mouseDown = false,
             mouseX = 0,
             mouseY = 0;
+
         renderer.domElement.addEventListener('mousedown', function (evt) {
             mouseDown = true;
             mouseX = evt.clientX;
@@ -209,6 +204,16 @@
             evt.preventDefault();
             mouseDown = false;
         }, false);
+        
+        window.addEventListener( 'mousemove', function(){
+            mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+            mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+        }, false );
+        
+        window.addEventListener( 'click', function(){
+            mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+            mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+        }, false );
         
         renderer.setSize(webGLSize.width, webGLSize.heigth);/*랜더링 사이즈*/
         renderer.setClearColor(0xf0f0f0);/* 랜더 배경화면 색상 지정*/
@@ -265,8 +270,26 @@
         scene.add(group);
     }
 
+    function render() {
+        
+        raycaster.setFromCamera( mouse, camera );
+        const intersects = raycaster.intersectObjects( group.children );
+
+        for ( let i = 0; i < intersects.length; i ++ ) {
+            //intersects[ i ].object.material.color.set( 0xff0000 );
+        }
+
+        requestAnimationFrame(render);
+        renderer.render( scene, camera );
+    }
+
+    /* 설정 초기화*/
     init();
+
+    /* 눈금 그리드 그리기 */
     drawGrid(gridSize);
+
+    /* 테스트 데이터 그리기 */
     drawBox(5, 1, 0x000000, {x:6.5 ,y:0.5});
     drawBox(5, 1, 0x000000, {x:6.5 ,y:9.5});
     drawBox(5, 1, 0x000000, {x:6.5 ,y:-9.5});
@@ -320,6 +343,47 @@
     drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:-7.5}, 0x0000ff, 40);
     drawBox(1.5, 1, 0xffffff, {x:5.25 ,y:-8.5}, 0x0000ff, 40);
 
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:1.5}, 0x0000ff, 10, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:2.5}, 0x0000ff, 20, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:3.5}, 0x0000ff, 30, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:4.5}, 0x0000ff, 40, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:5.5}, 0x0000ff, 50, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:6.5}, 0x0000ff, 60, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:7.5}, 0x0000ff, 70, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:8.5}, 0x0000ff, 80, 'R');
+    
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-0.5}, 0x0000ff, 10, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-1.5}, 0x0000ff, 50, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-2.5}, 0x0000ff, 30, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-3.5}, 0x0000ff, 100, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-4.5}, 0x0000ff, 90, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-5.5}, 0x0000ff, 70, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-6.5}, 0x0000ff, 50, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-7.5}, 0x0000ff, 40, 'R');
+    drawBox(1.5, 1, 0xffffff, {x:-5.25 ,y:-8.5}, 0x0000ff, 40, 'R');
+    
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:1.5}, 0x0000ff, 10);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:2.5}, 0x0000ff, 20);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:3.5}, 0x0000ff, 30);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:4.5}, 0x0000ff, 40);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:5.5}, 0x0000ff, 50);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:6.5}, 0x0000ff, 60);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:7.5}, 0x0000ff, 70);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:8.5}, 0x0000ff, 80);
+
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-0.5}, 0x0000ff, 10);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-1.5}, 0x0000ff, 50);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-2.5}, 0x0000ff, 30);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-3.5}, 0x0000ff, 100);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-4.5}, 0x0000ff, 90);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-5.5}, 0x0000ff, 70);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-6.5}, 0x0000ff, 50);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-7.5}, 0x0000ff, 40);
+    drawBox(1.5, 1, 0xffffff, {x:-7.75 ,y:-8.5}, 0x0000ff, 40);
+
+    /* 랜더링 */
+    render() ;
+    
     // var geo = new THREE.Geometry();
     // geo.vertices.push(
     //     new THREE.Vector3(-0.5, 0.5, 0),
@@ -352,7 +416,7 @@
     //addLine([30, -30, 0],[-30, -30, 0], 0x000000);
     //addLine([-30, -30, 0],[-30, 30, 0], 0x000000);
 
-    animate();
+
 </script>
 
 </html> 
