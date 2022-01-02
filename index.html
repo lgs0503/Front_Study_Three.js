@@ -36,44 +36,38 @@
     const raycaster = new THREE.Raycaster();
     const mouse = new THREE.Vector2();
 
-    function drawDoor(pos, color, status){
-        const tempgGroup = new THREE.Group(); 
+    function drawDoor(pos, color, status, rotation){
+        if(status){
+            const tempgGroup = new THREE.Group(); 
         
-        const shape = new THREE.Shape();
-        shape.moveTo( 2, 0 );
-        shape.bezierCurveTo( 0, 0, 0, 0, 0, 0 );
-        shape.bezierCurveTo( 0, 0, 0, 0, 0, 2 );
-        shape.bezierCurveTo( 1, 2, 2, 1, 2, 0 );
+            const shape = new THREE.Shape();
+            if(status == "R"){
+                shape.moveTo( 2, 0 );
+                shape.bezierCurveTo( 0, 0, 0, 0, 0, 0 );
+                shape.bezierCurveTo( 0, 0, 0, 0, 0, 2 );
+                shape.bezierCurveTo( 1, 2, 2, 1, 2, 0 );
+            } else if(status == "L") {
+                shape.moveTo( -2, 0 );
+                shape.bezierCurveTo( 0, 0, 0, 0, 0, 0 );
+                shape.bezierCurveTo( 0, 0, 0, 0, 0, 2 );
+                shape.bezierCurveTo( -1, 2, -2, 1, -2, 0 );
+            }
 
-        const geometry = new THREE.BufferGeometry();
-        const points = shape.getPoints();
-        geometry.setFromPoints(points);
+            const geometry = new THREE.BufferGeometry();
+            const points = shape.getPoints();
+            geometry.setFromPoints(points);
 
-        const material = new THREE.LineBasicMaterial({ color: color });
-        const line = new THREE.Line(geometry, material);
+            const material = new THREE.LineBasicMaterial({ color: color });
+            const line = new THREE.Line(geometry, material);
 
-        if(status == 'double'){
-            const shapeDb = new THREE.Shape();
-            shapeDb.moveTo( -2, 0 );
-            shapeDb.bezierCurveTo( 0, 0, 0, 0, 0, 0 );
-            shapeDb.bezierCurveTo( 0, 0, 0, 0, 0, 2 );
-            shapeDb.bezierCurveTo( -1, 2, -2, 1, -2, 0 );
-
-            const geometryDb = new THREE.BufferGeometry();
-            const pointsDb = shapeDb.getPoints();
-            geometryDb.setFromPoints(pointsDb);
-
-            const materialDb = new THREE.LineBasicMaterial({ color: color});
-            const lineDb = new THREE.Line(geometryDb, materialDb);
+            tempgGroup.add(line);
             
-            tempgGroup.add(lineDb);
+            tempgGroup.position.set(pos.x, pos.y, 0.003);
+            if(rotation){
+                tempgGroup.rotation.z = rotation;
+            }
+            scene.add(tempgGroup);
         }
-
-        tempgGroup.add(line);
-        
-        tempgGroup.position.set(pos.x, pos.y, 0.003);
-        //tempgGroup.rotation.z = 1.58; //회전
-        scene.add(tempgGroup);
     }
 
     /* 박스 그리기 */
@@ -125,6 +119,7 @@
             }
         }
 
+        tempgGroup.name ="test";
         tempgGroup.position.x = pos.x;
         tempgGroup.position.y = pos.y;
 
@@ -313,10 +308,11 @@
     function render() {
         
         raycaster.setFromCamera( mouse, camera );
-        const intersects = raycaster.intersectObjects( group.children );
+        const intersects = raycaster.intersectObjects( scene.children, true );
 
         for ( let i = 0; i < intersects.length; i ++ ) {
-            //intersects[ i ].object.material.color.set( 0xff0000 );
+            //intersects[i].object.material.color.set( 0xff0000 );
+            console.log("name : "+ intersects[i].object.material.name);
         }
 
         requestAnimationFrame(render);
@@ -329,9 +325,15 @@
     /* 눈금 그리드 그리기 */
     drawGrid(gridSize);
 
-    drawDoor({x:0, y:13.25}, 0x393E46, "double");
+    //문
+    drawDoor({x:0.2, y:13.25}, 0x393E46, "R");
+    drawDoor({x:-0.2, y:13.25}, 0x393E46, "L");
+
+    drawDoor({x:-0.2, y:-13.25}, 0x393E46, "R", 3.15);
+    drawDoor({x:0.2, y:-13.25}, 0x393E46, "L", 3.15);
 
     /* 테스트 데이터 그리기 */
+    //벽
     drawBox(5, 1, 0x222831, {x:6.5 ,y:0.5});
     drawBox(5, 1, 0x222831, {x:6.5 ,y:9.5});
     drawBox(5, 1, 0x222831, {x:6.5 ,y:-9.5});
@@ -347,11 +349,13 @@
     drawBox(0.5, 23, 0x222831, {x:13 ,y:0});
     drawBox(0.5, 23, 0x222831, {x:-13 ,y:0});
 
+    //기둥
     drawBox(3, 3, 0x222831, {x:13 ,y:13});
     drawBox(3, 3, 0x222831, {x:-13 ,y:-13});
     drawBox(3, 3, 0x222831, {x:13 ,y:-13});
     drawBox(3, 3, 0x222831, {x:-13 ,y:13});
 
+    //렉
     drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:1.5}, 0x393E46, 10, 'R');
     drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:2.5}, 0x393E46, 20, 'R');
     drawBox(1.5, 1, 0xffffff, {x:7.75 ,y:3.5}, 0x393E46, 30, 'R');
